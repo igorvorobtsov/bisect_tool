@@ -4,8 +4,11 @@
 # Usage:
 #   ./bisect_opt.sh '<compiler command>' <source.c> '<expected-output-pattern>'
 #
-# Example usage from ISVC 06622551: ./bisect_opt.sh ifx test.f90 '240.0000      0.0000000E+00'
-# CMPLRLLVM-69793: ./bisect_opt.sh icx test_mf_conversion_strict.c 'FAIL: Mismatch detected between original and volatile loop!'
+# Example usage: 
+# ./bisect_opt.sh ifx test.f90 '240.0000      0.0000000E+00'
+# ./bisect_opt.sh icx test_mf_conversion_strict.c 'FAIL: Mismatch detected between original and volatile loop!'
+# ./bisect_opt.sh ifx test_fail.f90 SIGSEGV
+
 set -euo pipefail
 
 if [[ $# -lt 3 ]]; then
@@ -90,5 +93,6 @@ eval "$COMPILER_CMD -O2 -S -emit-llvm -mllvm -opt-bisect-limit=$PREV \"$SOURCE\"
 
 echo "🔸 IR at failing pass (limit=$LOW): after.ll"
 eval "$COMPILER_CMD -O2 -S -emit-llvm -mllvm -opt-bisect-limit=$LOW \"$SOURCE\" -o after.ll"
+
 
 echo "📄 Use: diff -u before.ll after.ll | less"
